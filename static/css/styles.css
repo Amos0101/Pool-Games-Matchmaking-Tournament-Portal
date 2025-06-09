@@ -1,0 +1,47 @@
+/* Pool Portal Button Styles */
+.btn-pool-primary {
+  background-color: #0B3D2E;
+  color: white;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn-pool-primary:hover {
+  background-color: #0d4d38;
+  color: #FFD700;
+}
+
+.btn-pool-outline {
+  background-color: transparent;
+  color: #ffffff;
+  border: 2px solid #FFD700;
+  transition: all 0.3s ease;
+}
+
+.btn-pool-outline:hover {
+  background-color: #FFD700;
+  color: #0B3D2E;
+}
+
+/* For "View All Events" button */
+.btn-gold {
+  background-color: #FFD700;
+  color: #000;
+  border: none;
+}
+
+.btn-gold:hover {
+  background-color: #e6c200;
+  color: #000;
+}
+
+/* Card hover enhancement */
+.hover-shadow:hover {
+  transform: scale(1.02);
+  transition: 0.3s ease;
+}
+
+/* Hero Button Spacing Fix */
+.hero-section .btn {
+  min-width: 160px;
+}

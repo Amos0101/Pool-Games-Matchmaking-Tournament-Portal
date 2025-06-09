@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Pool Games Portal{% endblock %}
+
+{% block content %}
+<!--<style>-->
+
+<!--    /* Background: deep pool table green */-->
+<!--body {-->
+<!--  background: linear-gradient(135deg, #004d40, #00695c);-->
+<!--  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;-->
+<!--}-->
+
+<!--/* Center container vertically */-->
+<!--.container.py-5 {-->
+<!--  min-height: 80vh;-->
+<!--  display: flex;-->
+<!--  align-items: center;-->
+<!--  justify-content: center;-->
+<!--}-->
+
+<!--/* Card styling */-->
+<!--.card {-->
+<!--  border-radius: 15px;-->
+<!--  background-color: #00332f;-->
+<!--  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);-->
+<!--  border: none;-->
+<!--}-->
+
+<!--/* Card header styling */-->
+<!--.card-header {-->
+<!--  background-color: #00796b !important;-->
+<!--  border-top-left-radius: 15px;-->
+<!--  border-top-right-radius: 15px;-->
+<!--  font-weight: 700;-->
+<!--  font-size: 1.8rem;-->
+<!--  color: #e0f2f1 !important;-->
+<!--  text-shadow: 0 0 6px rgba(0, 0, 0, 0.3);-->
+<!--}-->
+
+<!--.card-header i {-->
+<!--  color: #a5d6a7;-->
+<!--}-->
+
+<!--/* Form labels */-->
+<!--.form-label {-->
+<!--  color: #a5d6a7;-->
+<!--  font-weight: 600;-->
+<!--}-->
+
+<!--/* Input fields */-->
+<!--.form-control {-->
+<!--  background-color: #004d40;-->
+<!--  border: 1px solid #00796b;-->
+<!--  color: #c8e6c9;-->
+<!--  font-size: 1.1rem;-->
+<!--}-->
+
+<!--/* Input focus */-->
+<!--.form-control:focus {-->
+<!--  background-color: #00796b;-->
+<!--  color: #e0f2f1;-->
+<!--  border-color: #a5d6a7;-->
+<!--  box-shadow: 0 0 8px #a5d6a7;-->
+<!--}-->
+
+<!--/* Login button - black with green accents */-->
+<!--.btn-primary {-->
+<!--  background-color: black; /* pure black */-->
+<!--  border: none;-->
+<!--  font-weight: 700;-->
+<!--  font-size: 1.2rem;-->
+<!--  transition: background-color 0.3s ease;-->
+<!--  color: #a5d6a7; /* pool green text */-->
+<!--}-->
+
+<!--.btn-primary:hover,-->
+<!--.btn-primary:focus {-->
+<!--  background-color: #222222; /* dark gray on hover */-->
+<!--  box-shadow: 0 0 12px #a5d6a7; /* green glow */-->
+<!--  color: #c8e6c9;-->
+<!--}-->
+
+<!--/* Error message */-->
+<!--.alert-danger {-->
+<!--  background-color: #b71c1c !important;-->
+<!--  color: #ffcdd2 !important;-->
+<!--  border: none !important;-->
+<!--  font-weight: 600;-->
+<!--}-->
+
+<!--/* Links */-->
+<!--a {-->
+<!--  color: #a5d6a7;-->
+<!--  font-weight: 600;-->
+<!--  text-decoration: none;-->
+<!--  transition: color 0.3s ease;-->
+<!--}-->
+
+<!--a:hover {-->
+<!--  color: #c8e6c9;-->
+<!--  text-decoration: underline;-->
+<!--}-->
+
+<!--/* Text in footer */-->
+<!--.text-center p {-->
+<!--  color: #c8e6c9;-->
+<!--}-->
+
+<!--/* Responsive width for login form container */-->
+<!--.col-md-5 {-->
+<!--  width: 500px !important;-->
+<!--  max-width: 100% !important;-->
+<!--  margin: 0 auto;-->
+<!--}-->
+
+<!--/* Medium and smaller screens */-->
+<!--@media (max-width: 992px) {-->
+<!--  .col-md-5 {-->
+<!--    width: 90% !important;-->
+<!--    max-width: none !important;-->
+<!--  }-->
+<!--}-->
+
+<!--/* Small screens (phones) */-->
+<!--@media (max-width: 576px) {-->
+<!--  .col-md-5 {-->
+<!--    width: 95% !important;-->
+<!--    max-width: none !important;-->
+<!--  }-->
+<!--}-->
+
+
+<!--</style>-->
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3><i class="fas fa-sign-in-alt me-2"></i>Login</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                            <input type="text" class="form-control" name="username" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+                            <input type="password" class="form-control" name="password" required>
+                        </div>
+
+                        {% if form.errors %}
+                            <div class="alert alert-danger">
+                                Invalid username or password.
+                            </div>
+                        {% endif %}
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">Login</button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <p>Don't have an account? <a href="{% url 'accounts:register' %}">Register here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

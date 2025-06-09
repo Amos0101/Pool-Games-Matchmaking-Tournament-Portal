@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+{% load static %}
+
+<style>
+
+     .hero-section {
+            background: green;
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            color: white;
+            position: relative;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero-content p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-image {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-image i {
+            font-size: 4rem;
+            opacity: 0.3;
+        }
+
+    @media (max-width: 768px) {
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+
+    .hero-content p {
+        font-size: 1rem;
+    }
+
+    .hero-section {
+        text-align: center;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+}
+
+
+</style>
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-6 mb-4 mb-md-0">
+                <div class="hero-content">
+                    <h1>Pool Tournament Platform</h1>
+                    <p>Register, challenge players, schedule matches, and compete for prize pools.</p>
+                    <div class="hero-actions d-grid gap-2 d-md-flex justify-content-md-start">
+                        {% if not user.is_authenticated %}
+                            <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg">Join Now</a>
+                            <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg">Login</a>
+                        {% else %}
+                            {% if user.user_type == 'player' %}
+                                <a href="{% url 'matches:create_match' %}" class="btn btn-light btn-lg">Create Match</a>
+                            {% endif %}
+                            <a href="{% url 'accounts:player_directory' %}" class="btn btn-outline-light btn-lg">Browse Players</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="hero-image text-center">
+                    <img src="{% static 'images/img.png' %}" alt="Pool Game" class="img-fluid" style="max-height: 400px;,max-width:600px;">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+<!-- Featured Events -->
+{% if featured_events %}
+<section class="py-5" style="background-color: #f5f5f5;">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-5">Upcoming Events</h2>
+        <div class="row">
+            {% for event in featured_events %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm border-0 hover-shadow">
+                    {% if event.poster %}
+                        <img src="{{ event.poster.url }}" class="card-img-top" alt="{{ event.title }}" style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ event.title }}</h5>
+                        <p class="card-text">{{ event.description|truncatewords:20 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>{{ event.event_date|date:"M d, Y" }}
+                            </small>
+                            <small class="text-muted">
+                                <i class="fas fa-map-marker-alt me-1"></i>{{ event.location }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            {% if user.is_authenticated %}
+                <a href="{% url 'events:event_list' %}" class="btn btn-primary">View All Events</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Features Section -->
+<section class="py-5" style="background-color: #ffffff;">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-5">Why Choose Pool Portal?</h2>
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="p-4 bg-white rounded shadow-sm h-100">
+                    <div class="mb-3">
+                        <div class="rounded-circle bg-primary text-white d-inline-flex justify-content-center align-items-center" style="width: 60px; height: 60px;">
+                            <i class="fas fa-users fa-lg"></i>
+                        </div>
+                    </div>
+                    <h4>Find Players</h4>
+                    <p class="text-muted">Connect with pool players in your area and discover new opponents to challenge.</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="p-4 bg-white rounded shadow-sm h-100">
+                    <div class="mb-3">
+                        <div class="rounded-circle bg-success text-white d-inline-flex justify-content-center align-items-center" style="width: 60px; height: 60px;">
+                            <i class="fas fa-handshake fa-lg"></i>
+                        </div>
+                    </div>
+                    <h4>Organize Matches</h4>
+                    <p class="text-muted">Easily set up matches with venue, time, and bid details. Get confirmations instantly.</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="p-4 bg-white rounded shadow-sm h-100">
+                    <div class="mb-3">
+                        <div class="rounded-circle bg-warning text-white d-inline-flex justify-content-center align-items-center" style="width: 60px; height: 60px;">
+                            <i class="fas fa-trophy fa-lg"></i>
+                        </div>
+                    </div>
+                    <h4>Join Events</h4>
+                    <p class="text-muted">Stay updated with tournaments and special events happening in your community.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-5">How It Works</h2>
+        <div class="row text-center">
+            <div class="col-md-3 mb-4">
+                <div class="p-3 bg-light rounded shadow-sm h-100">
+                    <i class="fas fa-user-plus fa-2x mb-3 text-primary"></i>
+                    <h5>Register</h5>
+                    <p class="text-muted">Create a player or referee profile to join the community.</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="p-3 bg-light rounded shadow-sm h-100">
+                    <i class="fas fa-search fa-2x mb-3 text-success"></i>
+                    <h5>Find Opponents</h5>
+                    <p class="text-muted">Browse the directory and challenge others to a match.</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="p-3 bg-light rounded shadow-sm h-100">
+                    <i class="fas fa-calendar-plus fa-2x mb-3 text-warning"></i>
+                    <h5>Book Matches</h5>
+                    <p class="text-muted">Pick a venue, set a bid, and schedule your game.</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-4">
+                <div class="p-3 bg-light rounded shadow-sm h-100">
+                    <i class="fas fa-flag-checkered fa-2x mb-3 text-danger"></i>
+                    <h5>Play & Win</h5>
+                    <p class="text-muted">Meet at the venue, play, and track your victories!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

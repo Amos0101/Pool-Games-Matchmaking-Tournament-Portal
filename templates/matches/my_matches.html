@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}My Matches - Pool Games Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-gamepad me-2"></i>My Matches</h2>
+                <a href="{% url 'matches:create_match' %}" class="btn btn-success">
+                    <i class="fas fa-plus me-1"></i>Create New Match
+                </a>
+            </div>
+            
+            {% if matches %}
+                <div class="row">
+                    {% for match in matches %}
+                        <div class="col-lg-6 mb-4">
+                            <div class="card match-card match-{{ match.status }} shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <h5 class="card-title mb-0">
+                                            {% if match.challenger == user %}
+                                                vs {{ match.opponent.first_name }} {{ match.opponent.last_name }}
+                                            {% else %}
+                                                vs {{ match.challenger.first_name }} {{ match.challenger.last_name }}
+                                            {% endif %}
+                                        </h5>
+                                        <span class="badge bg-{% if match.status == 'pending' %}warning{% elif match.status == 'confirmed' %}success{% elif match.status == 'cancelled' %}danger{% else %}secondary{% endif %}">
+                                            {{ match.get_status_display }}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="row text-muted small mb-3">
+                                        <div class="col-6">
+                                            <i class="fas fa-map-marker-alt me-1"></i>{{ match.venue.name }}
+                                        </div>
+                                        <div class="col-6">
+                                            <i class="fas fa-dollar-sign me-1"></i>${{ match.bid_amount }}
+                                        </div>
+                                        <div class="col-6 mt-1">
+                                            <i class="fas fa-calendar me-1"></i>{{ match.match_date }}
+                                        </div>
+                                        <div class="col-6 mt-1">
+                                            <i class="fas fa-clock me-1"></i>{{ match.match_time }}
+                                        </div>
+                                    </div>
+                                    
+                                    {% if match.status == 'pending' %}
+                                        <div class="d-flex gap-2">
+                                            {% if match.opponent == user %}
+                                                <button class="btn btn-success btn-sm" onclick="confirmMatch({{ match.id }})">
+                                                    <i class="fas fa-check me-1"></i>Confirm
+                                                </button>
+                                            {% endif %}
+                                            <button class="btn btn-danger btn-sm" onclick="cancelMatch({{ match.id }})">
+                                                <i class="fas fa-times me-1"></i>Cancel
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-gamepad fa-4x text-muted mb-3"></i>
+                    <h4>No matches yet</h4>
+                    <p class="text-muted">Create your first match to get started!</p>
+                    <a href="{% url 'matches:create_match' %}" class="btn btn-success">Create Match</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function confirmMatch(matchId) {
+    if (confirm('Are you sure you want to confirm this match?')) {
+        fetch(`/matches/confirm/${matchId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+    }
+}
+
+function cancelMatch(matchId) {
+    if (confirm('Are you sure you want to cancel this match?')) {
+        fetch(`/matches/cancel/${matchId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+    }
+}
+</script>
+{% endblock %}
