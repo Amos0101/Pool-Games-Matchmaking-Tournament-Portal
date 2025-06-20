@@ -1,249 +1,895 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>{% block title %}Pool Games Portal{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Pool Games Portal{% endblock %}</title>
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            /* Color Palette */
+            --primary-color: #1e40af;
+            --primary-dark: #1e3a8a;
+            --primary-light: #3b82f6;
+            --secondary-color: #059669;
+            --secondary-dark: #047857;
+            --secondary-light: #10b981;
+            --accent-color: #f59e0b;
+            --accent-dark: #d97706;
+            --accent-light: #fbbf24;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --muted-color: #6b7280;
+            --border-color: #e5e7eb;
 
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-heading: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
 
-    {%load static%}
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-   <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+            /* Spacing */
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --border-radius-lg: 16px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
 
-  <style>
-    body {
-      font-family: 'Montserrat', sans-serif;
-      background-color: #f8f9fa;
-    }
+        * {
+            box-sizing: border-box;
+        }
 
-    .navbar {
-      background-color: #1f2937 !important;
-      padding: 0.8rem 1rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      z-index: 1000;
-    }
+        body {
+            font-family: var(--font-primary);
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #ffffff;
+        }
 
-    .navbar-brand,
-    .navbar-nav .nav-link {
-      color: #ffffff !important;
-    }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--dark-color);
+        }
 
-    .navbar-nav .nav-link:hover {
-      color: #60a5fa !important;
-    }
+        /* Navigation Styles */
+        .navbar {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            padding: 1rem 0;
+        }
 
-    .hero-section {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 90px 0;
-      text-align: center;
-    }
+        .navbar-brand {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color) !important;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
 
-    .dropdown-menu {
-      border-radius: 0.5rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
+        .navbar-brand:hover {
+            color: var(--primary-dark) !important;
+            transform: translateY(-1px);
+        }
 
-    .rounded-circle {
-      object-fit: cover;
-    }
+        .navbar-brand i {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
-    footer {
-      background-color: #1f2937;
-      color: #fff;
-    }
+        .nav-link {
+            font-weight: 500;
+            color: var(--dark-color) !important;
+            padding: 0.75rem 1rem !important;
+            border-radius: var(--border-radius-sm);
+            transition: all 0.3s ease;
+            position: relative;
+        }
 
-    footer a {
-      color: #adb5bd;
-      text-decoration: none;
-    }
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+            background-color: rgba(30, 64, 175, 0.1);
+            transform: translateY(-1px);
+        }
 
-    footer a:hover {
-      color: #ffffff;
-    }
+        .nav-link.active {
+            color: var(--primary-color) !important;
+            background-color: rgba(30, 64, 175, 0.1);
+        }
 
-    .footer-icon {
-      font-size: 1.2rem;
-      margin-right: 0.5rem;
-    }
+        .dropdown-menu {
+            border: none;
+            box-shadow: var(--shadow-lg);
+            border-radius: var(--border-radius);
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
 
-    .player-card {
-      transition: transform 0.2s;
-    }
+        .dropdown-item {
+            border-radius: var(--border-radius-sm);
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
 
-    .player-card:hover {
-      transform: translateY(-5px);
-    }
+        .dropdown-item:hover {
+            background-color: var(--light-color);
+            color: var(--primary-color);
+        }
 
-    .match-card {
-      border-left: 4px solid #007bff;
-    }
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%);
+            color: white;
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .match-pending { border-left-color: #ffc107; }
-    .match-confirmed { border-left-color: #28a745; }
-    .match-cancelled { border-left-color: #dc3545; }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
 
-    /* Ensures content is visible below the fixed navbar */
-    body::before {
-      content: "";
-      display: block;
-      height: 70px;
-    }
-  </style>
+        .hero-section .container {
+            position: relative;
+            z-index: 2;
+        }
 
-  {% block extra_css %}{% endblock %}
+        /* Card Styles */
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border: none;
+            padding: 1.5rem;
+            color: white;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-footer {
+            background-color: var(--light-color);
+            border: none;
+            padding: 1.5rem;
+        }
+
+        /* Button Styles */
+        .btn {
+            font-weight: 500;
+            border-radius: var(--border-radius-sm);
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, var(--secondary-dark), var(--secondary-color));
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #059669, var(--success-color));
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+            color: white;
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background: transparent;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-outline-light {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-outline-light:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Form Styles */
+        .form-control {
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Alert Styles */
+        .alert {
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.1));
+            color: var(--danger-color);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1));
+            color: var(--warning-color);
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(30, 64, 175, 0.1));
+            color: var(--info-color);
+            border-left: 4px solid var(--info-color);
+        }
+
+        /* Player Card Styles */
+        .player-card {
+            transition: all 0.3s ease;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        /* Match Card Styles */
+        .match-card {
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .match-pending {
+            border-left-color: var(--warning-color);
+        }
+
+        .match-confirmed {
+            border-left-color: var(--success-color);
+        }
+
+        .match-cancelled {
+            border-left-color: var(--danger-color);
+        }
+
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
+            color: white;
+            border-radius: 50%;
+            min-width: 18px;
+            height: 18px;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+            box-shadow: var(--shadow);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: linear-gradient(135deg, var(--dark-color) 0%, #111827 100%);
+            color: #d1d5db;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+        }
+
+        .footer h5 {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .footer a {
+            color: #9ca3af;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .footer a:hover {
+            color: var(--primary-light);
+            transform: translateX(2px);
+        }
+
+        .footer .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .footer .social-links a:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .newsletter-form {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .newsletter-form .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .newsletter-form .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .newsletter-form .form-control:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: var(--primary-light);
+            color: white;
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .back-to-top.show {
+            display: flex;
+        }
+
+        /* Utility Classes */
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        }
+
+        .bg-gradient-secondary {
+            background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 60px 0;
+            }
+
+            .navbar-brand {
+                font-size: 1.3rem;
+            }
+
+            .back-to-top {
+                bottom: 1rem;
+                right: 1rem;
+                width: 45px;
+                height: 45px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-8ball me-2"></i>Pool Portal
+            </a>
 
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-  <div class="container">
-    <a class="navbar-brand" href="{% url 'home' %}">
-      <i class="fas fa-8ball me-2"></i>Pool Portal
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:player_directory' %}">
+                                <i class="fas fa-users me-1"></i>Players
+                            </a>
+                        </li>
+                        {% if user.user_type == 'player' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'matches:create_match' %}">
+                                    <i class="fas fa-plus-circle me-1"></i>Create Match
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'matches:my_matches' %}">
+                                    <i class="fas fa-gamepad me-1"></i>My Matches
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'chat:chat_list' %}">
+                                    <i class="fas fa-comments me-1"></i>Messages
+                                    <span id="unread-badge" class="notification-badge" style="display: none;">0</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'events:event_list' %}">
+                                <i class="fas fa-calendar-alt me-1"></i>Events
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                {% if user.profile_photo %}
+                                    <img src="{{ user.profile_photo.url }}" alt="Profile" class="rounded-circle me-2" width="30" height="30" style="object-fit: cover;">
+                                {% else %}
+                                    <i class="fas fa-user-circle me-2"></i>
+                                {% endif %}
+                                {{ user.first_name|default:user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                        <i class="fas fa-user me-2"></i>Profile
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'accounts:profile_edit' %}">
+                                        <i class="fas fa-edit me-2"></i>Edit Profile
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="POST" action="{% url 'accounts:logout' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item">Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:login' %}">
+                                <i class="fas fa-sign-in-alt me-1"></i>Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-primary ms-2" href="{% url 'accounts:register' %}">
+                                <i class="fas fa-user-plus me-1"></i>Join Now
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <!-- Only show non-chat related messages -->
+                {% if 'chat' not in message.tags and 'message' not in message.tags %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>{{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer py-5 mt-5">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Brand Section -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="mb-4">
+                        <h5 class="text-gradient">
+                            <i class="fas fa-8ball me-2"></i>Pool Games Portal
+                        </h5>
+                        <p class="mb-3">Connect with pool enthusiasts, organize matches, and join exciting tournaments in your area. Build your skills and compete with players of all levels.</p>
+                        <div class="social-links">
+                            <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" title="YouTube"><i class="fab fa-youtube"></i></a>
+                            <a href="#" title="Discord"><i class="fab fa-discord"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="col-lg-2 col-md-6">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'home' %}"><i class="fas fa-home me-2"></i>Home</a></li>
+                        <li class="mb-2"><a href="{% url 'accounts:player_directory' %}"><i class="fas fa-users me-2"></i>Find Players</a></li>
+                        <li class="mb-2"><a href="{% url 'events:event_list' %}"><i class="fas fa-calendar me-2"></i>Events</a></li>
+                        {% if user.is_authenticated and user.user_type == 'player' %}
+                            <li class="mb-2"><a href="{% url 'matches:create_match' %}"><i class="fas fa-plus me-2"></i>Create Match</a></li>
+                        {% endif %}
+                        <li class="mb-2"><a href="#"><i class="fas fa-trophy me-2"></i>Tournaments</a></li>
+                    </ul>
+                </div>
+
+                <!-- Support -->
+                <div class="col-lg-2 col-md-6">
+                    <h5>Support</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#"><i class="fas fa-question-circle me-2"></i>Help Center</a></li>
+                        <li class="mb-2"><a href="#"><i class="fas fa-book me-2"></i>Game Rules</a></li>
+                        <li class="mb-2"><a href="#"><i class="fas fa-shield-alt me-2"></i>Safety</a></li>
+                        <li class="mb-2"><a href="#"><i class="fas fa-envelope me-2"></i>Contact Us</a></li>
+                        <li class="mb-2"><a href="#"><i class="fas fa-bug me-2"></i>Report Issue</a></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="col-lg-4 col-md-6">
+                    <h5>Stay Updated</h5>
+                    <p class="mb-3">Get the latest news about tournaments, events, and new features.</p>
+                    <div class="newsletter-form">
+                        <form id="newsletter-form">
+                            <div class="input-group mb-3">
+                                <input type="email" class="form-control" placeholder="Enter your email" required>
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </form>
+                        <small class="text-muted">
+                            <i class="fas fa-lock me-1"></i>We respect your privacy. Unsubscribe anytime.
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4" style="border-color: rgba(255, 255, 255, 0.1);">
+
+            <!-- Bottom Footer -->
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2024 Pool Games Portal. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="d-flex justify-content-md-end justify-content-start flex-wrap gap-3 mt-3 mt-md-0">
+                        <a href="#" class="small">Privacy Policy</a>
+                        <a href="#" class="small">Terms of Service</a>
+                        <a href="#" class="small">Cookie Policy</a>
+                        <a href="#" class="small">Accessibility</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" title="Back to top">
+        <i class="fas fa-chevron-up"></i>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'home' %}">Home</a>
-        </li>
-        {% if user.is_authenticated %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'accounts:player_directory' %}">Players</a>
-          </li>
-          {% if user.user_type == 'player' %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'matches:create_match' %}">Create Match</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'matches:my_matches' %}">My Matches</a>
-            </li>
-          {% endif %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'events:event_list' %}">Events</a>
-          </li>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    {% block extra_js %}{% endblock %}
+
+    <!-- Base JavaScript -->
+    <script>
+        // Back to Top Button
+        const backToTopButton = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('show');
+            } else {
+                backToTopButton.classList.remove('show');
+            }
+        });
+
+        backToTopButton.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Newsletter Form
+        document.getElementById('newsletter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = this.querySelector('input[type="email"]').value;
+            const button = this.querySelector('button');
+            const originalText = button.innerHTML;
+
+            // Show loading state
+            button.innerHTML = '<div class="loading"></div>';
+            button.disabled = true;
+
+            // Simulate API call
+            setTimeout(() => {
+                button.innerHTML = '<i class="fas fa-check"></i>';
+                button.classList.remove('btn-primary');
+                button.classList.add('btn-success');
+
+                // Show success message
+                const form = this;
+                const successMsg = document.createElement('div');
+                successMsg.className = 'alert alert-success mt-2 mb-0';
+                successMsg.innerHTML = '<i class="fas fa-check-circle me-2"></i>Thanks for subscribing!';
+                form.appendChild(successMsg);
+
+                // Reset form after 3 seconds
+                setTimeout(() => {
+                    form.reset();
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                    button.classList.remove('btn-success');
+                    button.classList.add('btn-primary');
+                    successMsg.remove();
+                }, 3000);
+            }, 1500);
+        });
+
+        // Session Timeout Warning
+        let sessionWarningTime = 1500000; // 25 minutes in milliseconds
+        let sessionTimeout;
+
+        function resetSessionTimer() {
+            clearTimeout(sessionTimeout);
+            sessionTimeout = setTimeout(function() {
+                if (confirm('Your session will expire in 5 minutes due to inactivity. Click OK to stay logged in.')) {
+                    fetch(window.location.href, {
+                        method: 'HEAD',
+                        credentials: 'same-origin'
+                    });
+                    resetSessionTimer();
+                }
+            }, sessionWarningTime);
+        }
+
+        // Only run for authenticated users
+        {% if user.is_authenticated and user.user_type == 'player' %}
+            resetSessionTimer();
+
+            document.addEventListener('click', resetSessionTimer);
+            document.addEventListener('keypress', resetSessionTimer);
+            document.addEventListener('scroll', resetSessionTimer);
+
+            // Update unread message count
+            function updateUnreadCount() {
+                fetch('/chat/api/unread-count/')
+                    .then(response => response.json())
+                    .then(data => {
+                        const badge = document.getElementById('unread-badge');
+                        if (badge) {
+                            if (data.unread_count > 0) {
+                                badge.textContent = data.unread_count > 99 ? '99+' : data.unread_count;
+                                badge.style.display = 'flex';
+                            } else {
+                                badge.style.display = 'none';
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error fetching unread count:', error));
+            }
+
+            window.updateUnreadCount = updateUnreadCount;
+            updateUnreadCount();
+            setInterval(updateUnreadCount, 15000);
+
+            // Browser notification support
+            function requestNotificationPermission() {
+                if ("Notification" in window && Notification.permission === "default") {
+                    Notification.requestPermission();
+                }
+            }
+
+            function showBrowserNotification(title, message, icon) {
+                if ("Notification" in window && Notification.permission === "granted") {
+                    const notification = new Notification(title, {
+                        body: message,
+                        icon: icon || '/static/favicon.ico',
+                        tag: 'pool-portal-message'
+                    });
+
+                    setTimeout(() => notification.close(), 5000);
+
+                    notification.onclick = function() {
+                        window.focus();
+                        this.close();
+                    };
+                }
+            }
+
+            requestNotificationPermission();
         {% endif %}
-      </ul>
 
-      <ul class="navbar-nav">
-        {% if user.is_authenticated %}
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-              {% if user.profile_photo %}
-                <img src="{{ user.profile_photo.url }}" alt="Profile" class="rounded-circle me-2" width="30" height="30">
-              {% endif %}
-              {{ user.first_name|default:user.username }}
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Profile</a></li>
-              <li><a class="dropdown-item" href="{% url 'accounts:profile_edit' %}">Edit Profile</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li>
-                <form method="POST" action="{% url 'accounts:logout' %}" style="display:inline;">
-                  {% csrf_token %}
-                  <button type="submit" class="dropdown-item">Logout</button>
-                </form>
-              </li>
-            </ul>
-          </li>
-        {% else %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'accounts:register' %}">Register</a>
-          </li>
-        {% endif %}
-      </ul>
-    </div>
-  </div>
-</nav>
+        // Add active class to current nav item
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
 
-<!-- Flash Messages -->
-{% if messages %}
-  <div class="container mt-3">
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      </div>
-    {% endfor %}
-  </div>
-{% endif %}
-
-<!-- Page Content -->
-<main>
-  {% block content %}{% endblock %}
-</main>
-
-<!-- Footer -->
-<!-- Enhanced Footer -->
-<footer class="py-4 mt-5 text-white">
-  <div class="container">
-    <div class="row text-center text-md-start">
-      <div class="col-md-4 mb-3 mb-md-0">
-        <h5><i class="fas fa-8ball me-2"></i>Pool Games Portal</h5>
-        <p>Connecting players and promoting the game you love. Join matches, plan games, and enjoy events.</p>
-      </div>
-
-      <div class="col-md-4 mb-3 mb-md-0">
-        <h6 class="text-uppercase mb-3">Quick Links</h6>
-        <ul class="list-unstyled">
-          {% if not user.is_authenticated %}
-          <li><a href="{% url 'home' %}" class="footer-link"><i class="fas fa-home me-2"></i>Home</a></li>
-          <li><a href="{% url 'accounts:login' %}" class="footer-link"><i class="fas fa-users me-2"></i>Players</a></li>
-          <li><a href="{% url 'accounts:login' %}" class="footer-link"><i class="fas fa-calendar-alt me-2"></i>Events</a></li>
-          <li><a href="{% url 'accounts:login' %}" class="footer-link"><i class="fas fa-gamepad me-2"></i>My Matches</a></li>
-          {% else %}
-            {% if user.user_type == 'player' %}
-              <li><a href="{% url 'home' %}" class="footer-link"><i class="fas fa-home me-2"></i>Home</a></li>
-              <li><a href="{% url 'accounts:player_directory' %}" class="footer-link"><i class="fas fa-users me-2"></i>Players</a></li>
-              <li><a href="{% url 'events:event_list' %}" class="footer-link"><i class="fas fa-calendar-alt me-2"></i>Events</a></li>
-              <li><a href="{% url 'matches:my_matches' %}" class="footer-link"><i class="fas fa-gamepad me-2"></i>My Matches</a></li>
-          {% endif %}
-
-          {% if not user.user_type == 'player' %}
-              <li><a href="{% url 'home' %}" class="footer-link"><i class="fas fa-home me-2"></i>Home</a></li>
-              <li><a href="{% url 'accounts:player_directory' %}" class="footer-link"><i class="fas fa-users me-2"></i>Players</a></li>
-              <li><a href="{% url 'events:event_list' %}" class="footer-link"><i class="fas fa-calendar-alt me-2"></i>Events</a></li>
-            {% endif %}
-          {% endif %}
-
-        </ul>
-      </div>
-
-      <div class="col-md-4">
-        <h6 class="text-uppercase mb-3">Contact</h6>
-        <p><i class="fas fa-envelope me-2"></i> Amoskilonzo370@gmail.com</p>
-        <p><i class="fas fa-phone me-2"></i>+254 798 477 794</p>
-        <div class="mt-2">
-          <a href="https://www.facebook.com/" class="me-3 footer-icon"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" class="me-3 footer-icon"><i class="fab fa-twitter"></i></a>
-          <a href="#" class="footer-icon"><i class="fab fa-instagram"></i></a>
-        </div>
-      </div>
-    </div>
-
-    <hr class="border-light my-4">
-    <p class="mb-0 text-center">&copy; 2025 Pool Games Portal. All rights reserved.</p>
-  </div>
-</footer>
-
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-{% block extra_js %}{% endblock %}
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
 </body>
 </html>

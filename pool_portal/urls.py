@@ -12,6 +12,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('matches/', include('matches.urls')),
     path('events/', include('events.urls')),
+    path('chat/', include('chat.urls')),
 ]
 
 if settings.DEBUG:

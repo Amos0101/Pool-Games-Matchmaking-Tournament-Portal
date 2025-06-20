@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages - Pool Games Portal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-comments me-2"></i>Messages</h2>
+                <a href="{% url 'accounts:player_directory' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Start New Chat
+                </a>
+            </div>
+            
+            <div id="chat-rooms-container">
+                {% if chat_rooms_with_participants %}
+                    <div class="row" id="chat-rooms-list">
+                        {% for item in chat_rooms_with_participants %}
+                            <div class="col-lg-6 mb-3" data-room-id="{{ item.room.id }}">
+                                <div class="card chat-room-card shadow-sm">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="position-relative me-3">
+                                                {% if item.other_participant.profile_photo %}
+                                                    <img src="{{ item.other_participant.profile_photo.url }}" alt="{{ item.other_participant.username }}"
+                                                         class="rounded-circle" width="50" height="50" style="object-fit: cover;">
+                                                {% else %}
+                                                    <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center"
+                                                         style="width: 50px; height: 50px;">
+                                                        <i class="fas fa-user text-white"></i>
+                                                    </div>
+                                                {% endif %}
+                                                <span class="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle"
+                                                      style="width: 15px; height: 15px;" id="status-{{ item.other_participant.id }}"></span>
+                                            </div>
+
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <h6 class="mb-1">{{ item.other_participant.first_name }} {{ item.other_participant.last_name }}</h6>
+                                                    {% if item.unread_count > 0 %}
+                                                        <span class="badge bg-danger unread-badge">{{ item.unread_count }}</span>
+                                                    {% endif %}
+                                                </div>
+                                                <p class="text-muted small mb-0">@{{ item.other_participant.username }}</p>
+                                                <div class="last-message-container">
+                                                    {% if item.room.last_message %}
+                                                        <p class="text-muted small mb-0 last-message-text">
+                                                            <span class="sender-name">
+                                                                {% if item.room.last_message.sender == request.user %}You{% else %}{{ item.room.last_message.sender.first_name }}{% endif %}:
+                                                            </span>
+                                                            <span class="message-content">{{ item.room.last_message.content|truncatechars:40 }}</span>
+                                                        </p>
+                                                        <small class="text-muted last-message-time">{{ item.room.last_message.timestamp|timesince }} ago</small>
+                                                    {% else %}
+                                                        <p class="text-muted small mb-0 last-message-text">No messages yet</p>
+                                                        <small class="text-muted last-message-time"></small>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+
+                                            <div class="text-end">
+                                                <a href="{% url 'chat:chat_room' item.room.id %}" class="btn btn-outline-primary btn-sm">
+                                                    <i class="fas fa-comment"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5" id="no-chats-message">
+                        <i class="fas fa-comments fa-4x text-muted mb-3"></i>
+                        <h4>No conversations yet</h4>
+                        <p class="text-muted">Start chatting with other players to organize matches!</p>
+                        <a href="{% url 'accounts:player_directory' %}" class="btn btn-primary">
+                            Browse Players
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.chat-room-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.chat-room-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+}
+
+.unread-badge {
+    font-size: 0.7rem;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.new-message-highlight {
+    background-color: #e3f2fd !important;
+    border-left: 4px solid #2196f3;
+}
+
+.sender-name {
+    font-weight: 500;
+}
+
+.last-message-container {
+    min-height: 35px;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    console.log('Initializing chat list with real-time updates');
+
+    let chatListSocket = null;
+    let pollingInterval = null;
+
+    // Initialize WebSocket connection for notifications
+    function initializeChatListSocket() {
+        // Connect to user-specific WebSocket for notifications
+        const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+        const wsPath = `${wsScheme}://${window.location.host}/ws/user/{{ request.user.id }}/`;
+
+        try {
+            chatListSocket = new WebSocket(wsPath);
+
+            chatListSocket.onopen = function(e) {
+                console.log('Chat list WebSocket connected');
+            };
+
+            chatListSocket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                console.log('Received chat list update:', data);
+
+                if (data.type === 'notification_update') {
+                    updateChatRoomInList(data);
+                }
+            };
+
+            chatListSocket.onclose = function(e) {
+                console.log('Chat list WebSocket disconnected');
+                // Fallback to polling if WebSocket fails
+                startPolling();
+            };
+
+            chatListSocket.onerror = function(e) {
+                console.error('Chat list WebSocket error:', e);
+                // Fallback to polling
+                startPolling();
+            };
+
+        } catch (error) {
+            console.error('Failed to initialize WebSocket:', error);
+            startPolling();
+        }
+    }
+
+    // Polling fallback for chat list updates
+    function startPolling() {
+        if (pollingInterval) return; // Already polling
+
+        console.log('Starting chat list polling fallback');
+        pollingInterval = setInterval(updateChatList, 5000); // Poll every 5 seconds
+    }
+
+    // Update entire chat list
+    function updateChatList() {
+        fetch('/chat/api/chat-list-updates/')
+            .then(response => response.json())
+            .then(data => {
+                data.chat_updates.forEach(update => {
+                    updateChatRoomDisplay(update);
+                });
+
+                // Update global unread count
+                updateUnreadCount();
+            })
+            .catch(error => {
+                console.error('Error updating chat list:', error);
+            });
+    }
+
+    // Update specific chat room in the list
+    function updateChatRoomInList(notificationData) {
+        const roomElement = document.querySelector(`[data-room-id="${notificationData.room_id}"]`);
+        if (!roomElement) return;
+
+        // Add highlight effect
+        const cardElement = roomElement.querySelector('.chat-room-card');
+        cardElement.classList.add('new-message-highlight');
+        setTimeout(() => {
+            cardElement.classList.remove('new-message-highlight');
+        }, 3000);
+
+        // Update last message
+        const lastMessageText = roomElement.querySelector('.last-message-text');
+        const lastMessageTime = roomElement.querySelector('.last-message-time');
+        const senderName = roomElement.querySelector('.sender-name');
+
+        if (lastMessageText && senderName) {
+            senderName.textContent = `${notificationData.sender_username}:`;
+            const messageContent = roomElement.querySelector('.message-content');
+            if (messageContent) {
+                messageContent.textContent = notificationData.message_preview;
+            }
+        }
+
+        if (lastMessageTime) {
+            lastMessageTime.textContent = 'Just now';
+        }
+
+        // Update or add unread badge
+        let unreadBadge = roomElement.querySelector('.unread-badge');
+        if (!unreadBadge) {
+            const nameContainer = roomElement.querySelector('.d-flex.justify-content-between.align-items-start');
+            unreadBadge = document.createElement('span');
+            unreadBadge.className = 'badge bg-danger unread-badge';
+            nameContainer.appendChild(unreadBadge);
+        }
+
+        // Get current count and increment
+        const currentCount = parseInt(unreadBadge.textContent) || 0;
+        unreadBadge.textContent = currentCount + 1;
+        unreadBadge.style.display = 'flex';
+
+        // Move this chat to the top of the list
+        const chatList = document.getElementById('chat-rooms-list');
+        if (chatList && roomElement.parentNode === chatList) {
+            chatList.insertBefore(roomElement, chatList.firstChild);
+        }
+
+        // Update global unread count
+        setTimeout(updateUnreadCount, 100);
+    }
+
+    // Update chat room display from polling data
+    function updateChatRoomDisplay(updateData) {
+        const roomElement = document.querySelector(`[data-room-id="${updateData.room_id}"]`);
+        if (!roomElement) return;
+
+        // Update unread badge
+        let unreadBadge = roomElement.querySelector('.unread-badge');
+        if (updateData.unread_count > 0) {
+            if (!unreadBadge) {
+                const nameContainer = roomElement.querySelector('.d-flex.justify-content-between.align-items-start');
+                unreadBadge = document.createElement('span');
+                unreadBadge.className = 'badge bg-danger unread-badge';
+                nameContainer.appendChild(unreadBadge);
+            }
+            unreadBadge.textContent = updateData.unread_count;
+            unreadBadge.style.display = 'flex';
+        } else if (unreadBadge) {
+            unreadBadge.style.display = 'none';
+        }
+
+        // Update last message if available
+        if (updateData.last_message) {
+            const lastMessageText = roomElement.querySelector('.last-message-text');
+            const lastMessageTime = roomElement.querySelector('.last-message-time');
+
+            if (lastMessageText) {
+                const senderName = updateData.last_message.sender_username === '{{ request.user.username }}' ? 'You' : updateData.last_message.sender_username;
+                lastMessageText.innerHTML = `
+                    <span class="sender-name">${senderName}:</span>
+                    <span class="message-content">${updateData.last_message.content.substring(0, 40)}${updateData.last_message.content.length > 40 ? '...' : ''}</span>
+                `;
+            }
+
+            if (lastMessageTime) {
+                const messageTime = new Date(updateData.last_message.timestamp);
+                const now = new Date();
+                const diffMinutes = Math.floor((now - messageTime) / 60000);
+
+                if (diffMinutes < 1) {
+                    lastMessageTime.textContent = 'Just now';
+                } else if (diffMinutes < 60) {
+                    lastMessageTime.textContent = `${diffMinutes} min ago`;
+                } else {
+                    lastMessageTime.textContent = messageTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                }
+            }
+        }
+    }
+
+    // Update global unread count
+    function updateUnreadCount() {
+        if (typeof window.updateUnreadCount === 'function') {
+            window.updateUnreadCount();
+        }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Try WebSocket first, fallback to polling
+        initializeChatListSocket();
+
+        // Also start polling as backup
+        setTimeout(startPolling, 2000);
+
+        // Update unread count immediately
+        updateUnreadCount();
+    });
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', function() {
+        if (chatListSocket) {
+            chatListSocket.close();
+        }
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+
+{% block title %}Chat with {{ other_participant.first_name }} - Pool Games Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <!-- Chat Header -->
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex align-items-center">
+                        <a href="{% url 'chat:chat_list' %}" class="btn btn-outline-light btn-sm me-3">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+
+                        <div class="position-relative me-3">
+                            {% if other_participant.profile_photo %}
+                                <img src="{{ other_participant.profile_photo.url }}" alt="{{ other_participant.username }}"
+                                     class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+                            {% else %}
+                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center"
+                                     style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user text-primary"></i>
+                                </div>
+                            {% endif %}
+                            <span class="position-absolute bottom-0 end-0 bg-secondary border border-white rounded-circle"
+                                  style="width: 12px; height: 12px;" id="user-status"></span>
+                        </div>
+
+                        <div>
+                            <h6 class="mb-0">{{ other_participant.first_name }} {{ other_participant.last_name }}</h6>
+                            <small class="opacity-75" id="status-text">@{{ other_participant.username }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div class="card-body p-0">
+                    <div id="chat-messages" class="chat-messages p-3" style="height: 400px; overflow-y: auto;">
+                        {% for message in messages reversed %}
+                            <div class="message mb-3 {% if message.sender == request.user %}sent{% else %}received{% endif %}" data-message-id="{{ message.id }}">
+                                <div class="d-flex {% if message.sender == request.user %}justify-content-end{% endif %}">
+                                    <div class="message-bubble {% if message.sender == request.user %}bg-primary text-white{% else %}bg-light{% endif %} p-2 rounded"
+                                         style="max-width: 70%;">
+                                        <div class="message-content">{{ message.content }}</div>
+                                        <small class="message-time {% if message.sender == request.user %}text-white-50{% else %}text-muted{% endif %}">
+                                            {{ message.timestamp|date:"H:i" }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div id="no-messages" class="text-center text-muted py-5">
+                                <i class="fas fa-comments fa-3x mb-3"></i>
+                                <p>No messages yet. Start the conversation!</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Message Input -->
+                <div class="card-footer">
+                    <form id="message-form" class="d-flex">
+                        {% csrf_token %}
+                        <input type="text" id="message-input" class="form-control me-2"
+                               placeholder="Type your message..." autocomplete="off" required maxlength="1000">
+                        <button type="submit" class="btn btn-primary" id="send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Connection Status Indicator -->
+<div id="connection-status" class="position-fixed bottom-0 start-0 m-3" style="z-index: 1050;">
+    <div class="alert alert-success d-none" id="connection-success">
+        <i class="fas fa-check-circle"></i> Connected
+    </div>
+</div>
+
+<style>
+.chat-messages {
+    background-color: #f8f9fa;
+}
+
+.message-bubble {
+    word-wrap: break-word;
+    border-radius: 18px !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.message.sent .message-bubble {
+    border-bottom-right-radius: 4px !important;
+}
+
+.message.received .message-bubble {
+    border-bottom-left-radius: 4px !important;
+}
+
+.message-time {
+    font-size: 0.75rem;
+    display: block;
+    margin-top: 2px;
+}
+
+.message-sending {
+    opacity: 0.6;
+}
+
+#send-button:disabled {
+    opacity: 0.6;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const roomId = {{ chat_room.id }};
+    const currentUserId = {{ request.user.id }};
+    const otherUserId = {{ other_participant.id }};
+
+    console.log('Initializing HTTP-based chat for room:', roomId);
+
+    const messagesContainer = document.getElementById('chat-messages');
+    const messageForm = document.getElementById('message-form');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const userStatus = document.getElementById('user-status');
+    const statusText = document.getElementById('status-text');
+    const connectionSuccess = document.getElementById('connection-success');
+    const noMessagesDiv = document.getElementById('no-messages');
+
+    let lastMessageId = 0;
+    let pollingInterval;
+
+    // Get the last message ID from existing messages
+    const existingMessages = document.querySelectorAll('.message[data-message-id]');
+    if (existingMessages.length > 0) {
+        const lastMessage = existingMessages[existingMessages.length - 1];
+        lastMessageId = parseInt(lastMessage.getAttribute('data-message-id')) || 0;
+    }
+
+    // Show connection success
+    connectionSuccess.classList.remove('d-none');
+    setTimeout(() => {
+        connectionSuccess.classList.add('d-none');
+    }, 3000);
+
+    // Scroll to bottom of messages
+    function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // Initial scroll to bottom
+    scrollToBottom();
+
+    // Add message to chat
+    function addMessage(messageData) {
+        // Remove "no messages" indicator if it exists
+        if (noMessagesDiv) {
+            noMessagesDiv.remove();
+        }
+
+        const messageDiv = document.createElement('div');
+        const isSent = messageData.sender_id === currentUserId;
+
+        messageDiv.className = `message mb-3 ${isSent ? 'sent' : 'received'}`;
+        messageDiv.setAttribute('data-message-id', messageData.id);
+        messageDiv.innerHTML = `
+            <div class="d-flex ${isSent ? 'justify-content-end' : ''}">
+                <div class="message-bubble ${isSent ? 'bg-primary text-white' : 'bg-light'} p-2 rounded"
+                     style="max-width: 70%;">
+                    <div class="message-content">${escapeHtml(messageData.content)}</div>
+                    <small class="message-time ${isSent ? 'text-white-50' : 'text-muted'}">
+                        ${messageData.formatted_time}
+                    </small>
+                </div>
+            </div>
+        `;
+
+        messagesContainer.appendChild(messageDiv);
+        lastMessageId = Math.max(lastMessageId, messageData.id);
+
+        // Update notification count if this is from another user
+        if (!isSent) {
+            updateUnreadCount();
+        }
+    }
+
+    // Update user online status
+    function updateUserStatus(isOnline) {
+        if (isOnline) {
+            userStatus.className = 'position-absolute bottom-0 end-0 bg-success border border-white rounded-circle';
+            statusText.textContent = 'Online';
+        } else {
+            userStatus.className = 'position-absolute bottom-0 end-0 bg-secondary border border-white rounded-circle';
+            statusText.textContent = '@{{ other_participant.username }}';
+        }
+    }
+
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Poll for new messages
+    function pollMessages() {
+        fetch(`/chat/api/get-messages/${roomId}/?last_message_id=${lastMessageId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.messages && data.messages.length > 0) {
+                    data.messages.forEach(message => {
+                        addMessage(message);
+                    });
+                    scrollToBottom();
+                }
+
+                // Update user status
+                updateUserStatus(data.other_user_online);
+            })
+            .catch(error => {
+                console.error('Error polling messages:', error);
+            });
+    }
+
+    // Start polling for messages every 2 seconds
+    pollingInterval = setInterval(pollMessages, 2000);
+
+    // Send message
+    messageForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const message = messageInput.value.trim();
+
+        if (message) {
+            // Disable send button temporarily
+            sendButton.disabled = true;
+
+            fetch(`/chat/api/send-message/${roomId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                },
+                body: JSON.stringify({
+                    'message': message
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    addMessage(data.message);
+                    scrollToBottom();
+                    messageInput.value = '';
+                    console.log('Message sent successfully');
+                } else {
+                    alert('Error sending message: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error sending message:', error);
+                alert('Error sending message. Please try again.');
+            })
+            .finally(() => {
+                sendButton.disabled = false;
+            });
+        }
+    });
+
+    // Update unread count function
+    function updateUnreadCount() {
+        if (typeof window.updateUnreadCount === 'function') {
+            setTimeout(window.updateUnreadCount, 100);
+        }
+    }
+
+    // Focus on message input
+    messageInput.focus();
+
+    // Handle enter key in input
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            messageForm.dispatchEvent(new Event('submit'));
+        }
+    });
+
+    // Clean up polling when page is unloaded
+    window.addEventListener('beforeunload', function() {
+        if (pollingInterval) {
+            clearInterval(pollingInterval);
+        }
+    });
+
+    console.log('HTTP-based chat initialization complete');
+</script>
+{% endblock %}

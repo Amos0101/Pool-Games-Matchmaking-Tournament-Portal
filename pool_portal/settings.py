@@ -10,7 +10,16 @@ SECRET_KEY = 'django-insecure-your-secret-key-here-change-in-production'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+CSRF_TRUSTED_ORIGINS = [
+    'https://5e5b-2c0f-fe38-218a-ad38-2467-ff87-3baa-92c.ngrok-free.app',
+
+]
+
+
+ALLOWED_HOSTS = ['localhost',
+    '127.0.0.1',
+    '5e5b-2c0f-fe38-218a-ad38-2467-ff87-3baa-92c.ngrok-free.app',
+        ]
 
 # Application definition
 INSTALLED_APPS = [
@@ -20,9 +29,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
     'accounts',
     'matches',
     'events',
+    'chat',
+
 ]
 
 MIDDLEWARE = [
@@ -33,6 +45,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'accounts.middleware.SessionTimeoutMiddleware',
 ]
 
 ROOT_URLCONF = 'pool_portal.urls'
@@ -54,6 +67,14 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'pool_portal.wsgi.application'
+ASGI_APPLICATION = 'pool_portal.asgi.application'
+
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 
 # Database
 DATABASES = {
@@ -116,3 +137,36 @@ EMAIL_HOST_USER = 'amoskilonzo370@gmail.com'
 EMAIL_HOST_PASSWORD = 'xrus omnv zcju oehe'
 DEFAULT_FROM_EMAIL = 'Pool Games <amoskilonzo370@gmail.com>'
 
+
+# Session Configuration - Auto logout settings
+SESSION_COOKIE_AGE = 1800  # 30 minutes in seconds (30 * 60)
+SESSION_SAVE_EVERY_REQUEST = True  # Refresh session on every request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Session expires when browser closes
+
+# Alternative time options (uncomment the one you prefer):
+# SESSION_COOKIE_AGE = 3600   # 1 hour
+SESSION_COOKIE_AGE = 7200   # 2 hours
+# SESSION_COOKIE_AGE = 86400  # 24 hours
+
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'accounts.middleware': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'chat': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
-
+from django.db import models
 from .models import Match
 from .forms import MatchCreateForm
 from django.db.models import Q
