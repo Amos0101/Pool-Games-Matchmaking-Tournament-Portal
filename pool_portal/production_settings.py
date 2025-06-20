@@ -11,7 +11,21 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-in-produc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = ['*']  # Railway will handle the domain
+# IMPORTANT: Add your Railway domain here
+ALLOWED_HOSTS = [
+    '*',  # Temporary - allows all hosts
+    'localhost',
+    '127.0.0.1',
+    '.railway.app',  # All Railway subdomains
+]
+
+# CSRF Settings for Railway
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.railway.app',
+    'http://*.railway.app',
+    'https://localhost',
+    'http://localhost',
+]
 
 # Application definition
 INSTALLED_APPS = [
