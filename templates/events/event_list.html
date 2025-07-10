@@ -12,15 +12,29 @@
                 <div class="row">
                     {% for event in events %}
                         <div class="col-lg-4 col-md-6 mb-4">
-                            <div class="card h-100 shadow-sm">
+                            <div class="card h-100 shadow-sm event-card">
                                 {% if event.poster %}
-                                    <img src="{{ event.poster.url }}" class="card-img-top" alt="{{ event.title }}" 
-                                         style="height: 250px; object-fit: cover;">
+                                    <div class="event-poster-container">
+                                        <img src="{{ event.poster.url }}"
+                                             class="card-img-top event-poster"
+                                             alt="{{ event.title }}"
+                                             onclick="openImageModal('{{ event.poster.url }}', '{{ event.title }} - Event Poster')"
+                                             style="cursor: pointer;">
+                                        <div class="poster-overlay">
+                                            <i class="fas fa-expand-alt"></i>
+                                            <span>Click to view full size</span>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="card-img-top bg-gradient-primary d-flex align-items-center justify-content-center"
+                                         style="height: 250px;">
+                                        <i class="fas fa-trophy fa-3x text-white"></i>
+                                    </div>
                                 {% endif %}
                                 <div class="card-body d-flex flex-column">
                                     <h5 class="card-title">{{ event.title }}</h5>
                                     <p class="card-text flex-grow-1">{{ event.description }}</p>
-                                    
+
                                     <div class="mt-auto">
                                         <div class="d-flex justify-content-between align-items-center text-muted small">
                                             <span>
@@ -37,11 +51,18 @@
                                         </div>
                                     </div>
                                 </div>
+                                {% if not user.is_authenticated %}
+                                    <div class="card-footer bg-transparent border-0">
+                                        <a href="{% url 'accounts:register' %}" class="btn btn-primary w-100">
+                                            Join to Participate
+                                        </a>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                     {% endfor %}
                 </div>
-                
+
                 <!-- Pagination -->
                 {% if is_paginated %}
                     <nav aria-label="Events pagination">
@@ -54,11 +75,11 @@
                                     <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
                                 </li>
                             {% endif %}
-                            
+
                             <li class="page-item active">
                                 <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
                             </li>
-                            
+
                             {% if page_obj.has_next %}
                                 <li class="page-item">
                                     <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
@@ -80,4 +101,70 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Event Poster Styling */
+    .event-poster-container {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .event-poster {
+        width: 100%;
+        height: auto;
+        min-height: 250px;
+        object-fit: contain;
+        background-color: #f8f9fa;
+        transition: transform 0.3s ease;
+    }
+
+    .event-poster:hover {
+        transform: scale(1.05);
+    }
+
+    .poster-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .poster-overlay i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .event-poster-container:hover .poster-overlay {
+        opacity: 1;
+    }
+
+    .event-card:hover {
+        transform: translateY(-3px);
+        transition: all 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+        .event-poster {
+            min-height: 200px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .event-poster {
+            min-height: 180px;
+        }
+    }
+</style>
 {% endblock %}
