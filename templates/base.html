@@ -11,8 +11,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% load static %}{% static 'css/style.css' %}">
+
+    {% load static %}
 
     <style>
         :root {
@@ -137,29 +137,71 @@
             color: var(--primary-color);
         }
 
-        /* Hero Section */
-        .hero-section {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%);
+        /* Notification Badge */
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, var(--danger-color), #dc2626);
             color: white;
-            padding: 100px 0;
-            position: relative;
-            overflow: hidden;
+            border-radius: 50%;
+            min-width: 18px;
+            height: 18px;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+            box-shadow: var(--shadow);
         }
 
-        .hero-section::before {
-            content: '';
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Event poster styles */
+        .event-poster {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .event-poster:hover {
+            transform: scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .poster-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--border-radius-sm);
+        }
+
+        .poster-overlay {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
-            opacity: 0.3;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: var(--border-radius-sm);
         }
 
-        .hero-section .container {
-            position: relative;
-            z-index: 2;
+        .poster-container:hover .poster-overlay {
+            opacity: 1;
         }
 
         /* Card Styles */
@@ -242,33 +284,6 @@
             color: white;
         }
 
-        .btn-outline-primary {
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            background: transparent;
-        }
-
-        .btn-outline-primary:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: var(--shadow);
-        }
-
-        .btn-outline-light {
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .btn-outline-light:hover {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.5);
-            color: white;
-            transform: translateY(-1px);
-        }
-
         /* Form Styles */
         .form-control {
             border: 2px solid var(--border-color);
@@ -333,50 +348,6 @@
             box-shadow: var(--shadow-xl);
         }
 
-        /* Match Card Styles */
-        .match-card {
-            border-left: 4px solid var(--primary-color);
-            transition: all 0.3s ease;
-        }
-
-        .match-pending {
-            border-left-color: var(--warning-color);
-        }
-
-        .match-confirmed {
-            border-left-color: var(--success-color);
-        }
-
-        .match-cancelled {
-            border-left-color: var(--danger-color);
-        }
-
-        /* Notification Badge */
-        .notification-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: linear-gradient(135deg, var(--danger-color), #dc2626);
-            color: white;
-            border-radius: 50%;
-            min-width: 18px;
-            height: 18px;
-            font-size: 11px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid white;
-            animation: pulse 2s infinite;
-            box-shadow: var(--shadow);
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
         /* Footer Styles */
         .footer {
             background: linear-gradient(135deg, #1f2937, #374151);
@@ -396,28 +367,8 @@
             transform: translateY(-2px);
         }
 
-        /* Utility Classes */
-        .text-gradient {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .bg-gradient-primary {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        }
-
-        .bg-gradient-secondary {
-            background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
-        }
-
         /* Responsive Design */
         @media (max-width: 768px) {
-            .hero-section {
-                padding: 60px 0;
-            }
-
             .navbar-brand {
                 font-size: 1.25rem;
             }
@@ -425,58 +376,6 @@
             .navbar-brand img {
                 width: 32px;
                 height: 32px;
-            }
-
-            .back-to-top {
-                bottom: 1rem;
-                right: 1rem;
-                width: 45px;
-                height: 45px;
-            }
-        }
-
-        /* Loading Animation */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .navbar-logo {
-            height: 40px;
-            width: auto;
-            transition: transform 0.3s ease;
-        }
-
-        .navbar-logo:hover {
-            transform: scale(1.1);
-        }
-
-        .social-links a {
-            font-size: 1.2rem;
-            transition: color 0.3s ease, transform 0.3s ease;
-        }
-
-        .social-links a:hover {
-            color: #007bff !important;
-            transform: translateY(-2px);
-        }
-
-        @media (max-width: 768px) {
-            .navbar-logo {
-                height: 35px;
-            }
-
-            .social-links {
-                margin-top: 1rem;
             }
         }
     </style>
@@ -510,9 +409,12 @@
                                     <i class="fas fa-plus-circle me-1"></i>Create Match
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            <li class="nav-item position-relative">
                                 <a class="nav-link" href="{% url 'matches:my_matches' %}">
                                     <i class="fas fa-gamepad me-1"></i>My Matches
+                                    {% if pending_matches_count > 0 %}
+                                        <span class="notification-badge" id="matches-badge">{{ pending_matches_count }}</span>
+                                    {% endif %}
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -520,15 +422,21 @@
                                     <i class="fas fa-users me-1"></i>Players
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            <li class="nav-item position-relative">
                                 <a class="nav-link" href="{% url 'chat:chat_list' %}">
                                     <i class="fas fa-comments me-1"></i>Messages
+                                    {% if unread_messages > 0 %}
+                                        <span class="notification-badge" id="messages-badge">{{ unread_messages }}</span>
+                                    {% endif %}
                                 </a>
                             </li>
                         {% endif %}
-                        <li class="nav-item">
+                        <li class="nav-item position-relative">
                             <a class="nav-link" href="{% url 'events:event_list' %}">
                                 <i class="fas fa-calendar-alt me-1"></i>Events
+                                {% if new_events_count > 0 %}
+                                    <span class="notification-badge" id="events-badge">{{ new_events_count }}</span>
+                                {% endif %}
                             </a>
                         </li>
                     {% endif %}
@@ -648,11 +556,6 @@
         </div>
     </div>
 
-    <!-- Back to Top Button -->
-    <button class="back-to-top" id="backToTop" title="Back to top">
-        <i class="fas fa-chevron-up"></i>
-    </button>
-
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -671,77 +574,14 @@
             modal.show();
         }
 
-        // Social media hover effects
-        document.querySelectorAll('.social-link').forEach(link => {
-            link.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-3px)';
-                this.style.transition = 'all 0.3s ease';
-            });
-
-            link.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0)';
-            });
-        });
-
-        // Logo hover effect
-        document.querySelector('.logo-img').addEventListener('mouseenter', function() {
-            this.style.transform = 'rotate(10deg) scale(1.1)';
-            this.style.transition = 'all 0.3s ease';
-        });
-
-        document.querySelector('.logo-img').addEventListener('mouseleave', function() {
-            this.style.transform = 'rotate(0deg) scale(1)';
-        });
-
-        // Back to Top Button
-        const backToTopButton = document.getElementById('backToTop');
-
-        window.addEventListener('scroll', function() {
-            if (window.pageYOffset > 300) {
-                backToTopButton.classList.add('show');
-            } else {
-                backToTopButton.classList.remove('show');
-            }
-        });
-
-        backToTopButton.addEventListener('click', function() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-
-        // Session Timeout Warning
-        let sessionWarningTime = 1500000; // 25 minutes in milliseconds
-        let sessionTimeout;
-
-        function resetSessionTimer() {
-            clearTimeout(sessionTimeout);
-            sessionTimeout = setTimeout(function() {
-                if (confirm('Your session will expire in 5 minutes due to inactivity. Click OK to stay logged in.')) {
-                    fetch(window.location.href, {
-                        method: 'HEAD',
-                        credentials: 'same-origin'
-                    });
-                    resetSessionTimer();
-                }
-            }, sessionWarningTime);
-        }
-
-        // Only run for authenticated users
-        {% if user.is_authenticated and user.user_type == 'player' %}
-            resetSessionTimer();
-
-            document.addEventListener('click', resetSessionTimer);
-            document.addEventListener('keypress', resetSessionTimer);
-            document.addEventListener('scroll', resetSessionTimer);
-
-            // Update unread message count
-            function updateUnreadCount() {
+        // Update notification counts
+        function updateNotificationCounts() {
+            {% if user.is_authenticated and user.user_type == 'player' %}
+                // Update unread message count
                 fetch('/chat/api/unread-count/')
                     .then(response => response.json())
                     .then(data => {
-                        const badge = document.getElementById('unread-badge');
+                        const badge = document.getElementById('messages-badge');
                         if (badge) {
                             if (data.unread_count > 0) {
                                 badge.textContent = data.unread_count > 99 ? '99+' : data.unread_count;
@@ -752,38 +592,46 @@
                         }
                     })
                     .catch(error => console.error('Error fetching unread count:', error));
-            }
 
-            window.updateUnreadCount = updateUnreadCount;
-            updateUnreadCount();
-            setInterval(updateUnreadCount, 15000);
+                // Update pending matches count
+                fetch('/matches/api/pending-count/')
+                    .then(response => response.json())
+                    .then(data => {
+                        const badge = document.getElementById('matches-badge');
+                        if (badge) {
+                            if (data.pending_count > 0) {
+                                badge.textContent = data.pending_count > 99 ? '99+' : data.pending_count;
+                                badge.style.display = 'flex';
+                            } else {
+                                badge.style.display = 'none';
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error fetching pending matches count:', error));
 
-            // Browser notification support
-            function requestNotificationPermission() {
-                if ("Notification" in window && Notification.permission === "default") {
-                    Notification.requestPermission();
-                }
-            }
+                // Update new events count
+                fetch('/events/api/new-count/')
+                    .then(response => response.json())
+                    .then(data => {
+                        const badge = document.getElementById('events-badge');
+                        if (badge) {
+                            if (data.new_count > 0) {
+                                badge.textContent = data.new_count > 99 ? '99+' : data.new_count;
+                                badge.style.display = 'flex';
+                            } else {
+                                badge.style.display = 'none';
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error fetching new events count:', error));
+            {% endif %}
+        }
 
-            function showBrowserNotification(title, message, icon) {
-                if ("Notification" in window && Notification.permission === "granted") {
-                    const notification = new Notification(title, {
-                        body: message,
-                        icon: icon || '/static/favicon.ico',
-                        tag: 'pool-portal-message'
-                    });
-
-                    setTimeout(() => notification.close(), 5000);
-
-                    notification.onclick = function() {
-                        window.focus();
-                        this.close();
-                    };
-                }
-            }
-
-            requestNotificationPermission();
-        {% endif %}
+        // Update counts on page load and periodically
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNotificationCounts();
+            setInterval(updateNotificationCounts, 30000); // Update every 30 seconds
+        });
 
         // Add active class to current nav item
         document.addEventListener('DOMContentLoaded', function() {

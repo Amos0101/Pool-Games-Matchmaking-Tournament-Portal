@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-12">
             <h2 class="mb-4"><i class="fas fa-users me-2"></i>Player Directory</h2>
-            
+
             {% if players %}
                 <div class="row">
                     {% for player in players %}
@@ -15,18 +15,18 @@
                             <div class="card player-card h-100 shadow-sm">
                                 <div class="card-body text-center">
                                     {% if player.profile_photo %}
-                                        <img src="{{ player.profile_photo.url }}" alt="{{ player.username }}" 
+                                        <img src="{{ player.profile_photo.url }}" alt="{{ player.username }}"
                                              class="rounded-circle mb-3" width="80" height="80" style="object-fit: cover;">
                                     {% else %}
-                                        <div class="bg-secondary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" 
+                                        <div class="bg-secondary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
                                              style="width: 80px; height: 80px;">
                                             <i class="fas fa-user fa-2x text-white"></i>
                                         </div>
                                     {% endif %}
-                                    
+
                                     <h5 class="card-title">{{ player.first_name }} {{ player.last_name }}</h5>
                                     <p class="text-muted">@{{ player.username }}</p>
-                                    
+
                                     {% if player.player_profile %}
                                         <div class="mb-2">
                                             <span class="badge bg-primary">{{ player.player_profile.get_skill_level_display }}</span>
@@ -35,11 +35,17 @@
                                             <p class="card-text small">{{ player.player_profile.bio|truncatewords:15 }}</p>
                                         {% endif %}
                                     {% endif %}
-                                    
+
                                     <div class="text-muted small">
                                         <i class="fas fa-map-marker-alt me-1"></i>{{ player.location }}
                                     </div>
-                                    
+
+                                    {% if player.phone_number %}
+                                        <div class="text-muted small mt-2">
+                                            <i class="fas fa-phone me-1"></i>{{ player.phone_number }}
+                                        </div>
+                                    {% endif %}
+
                                     {% if user.user_type == 'player' and user != player %}
                                         <div class="mt-3">
                                             <a href="{% url 'matches:create_match' %}?opponent={{ player.id }}"
@@ -55,7 +61,7 @@
                         </div>
                     {% endfor %}
                 </div>
-                
+
                 <!-- Pagination -->
                 {% if is_paginated %}
                     <nav aria-label="Player directory pagination">
@@ -68,11 +74,11 @@
                                     <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
                                 </li>
                             {% endif %}
-                            
+
                             <li class="page-item active">
                                 <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
                             </li>
-                            
+
                             {% if page_obj.has_next %}
                                 <li class="page-item">
                                     <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
