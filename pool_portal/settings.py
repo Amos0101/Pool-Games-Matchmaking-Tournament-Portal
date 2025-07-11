@@ -16,10 +16,8 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 
-ALLOWED_HOSTS = ['localhost',
-    '127.0.0.1',
-    '5e5b-2c0f-fe38-218a-ad38-2467-ff87-3baa-92c.ngrok-free.app',
-        ]
+ALLOWED_HOSTS = ['.onrender.com']
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -170,3 +168,6 @@ LOGGING = {
         },
     },
 }
+
+
+
