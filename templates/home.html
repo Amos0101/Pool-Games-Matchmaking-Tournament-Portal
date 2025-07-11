@@ -8,61 +8,21 @@
         <div class="container">
             <div class="row align-items-center min-vh-75">
                 <div class="col-lg-8 mx-auto text-center">
-<!--                    <div class="hero-content">-->
-                        <h1 class="display-2 fw-bold mb-4 hero-title">
-                            Find Your Perfect
-                            <span class="hero-highlight">Pool Match</span>
-                        </h1>
-                        <p class="lead mb-5 hero-subtitle">
-                            Connect with pool enthusiasts in your area, organize exciting matches,
-                            and join tournaments. Whether you're a beginner or pro, find your game here.
-                        </p>
-                        <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center mb-4">
-                            <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg px-5 hero-btn">
-                                <i class="fas fa-user-plus me-2"></i>Join Free Today
-                            </a>
-                            <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg px-5 hero-btn">
-                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
-                            </a>
-                        </div>
-                        <div class="hero-stats">
-                            <small class="opacity-90">
-                                <i class="fas fa-users me-2"></i>Join 1,000+ players already connected
-                            </small>
-                        </div>
-<!--                    </div>-->
-                </div>
-            </div>
+<!--                  <div class="hero-content">-->
 
-            <!-- Floating Cards -->
-            <div class="floating-cards">
-                <div class="floating-card floating-card-1">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-success rounded-circle p-2 me-2">
-                            <i class="fas fa-gamepad text-white"></i>
-                        </div>
-                        <div>
-                            <div class="fw-bold text-dark">Live Matches</div>
-                            <small class="text-muted">24 active now</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="floating-card floating-card-2">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-primary rounded-circle p-2 me-2">
-                            <i class="fas fa-trophy text-white"></i>
-                        </div>
-                        <div>
-                            <div class="fw-bold text-dark">Tournaments</div>
-                            <small class="text-muted">3 this week</small>
-                        </div>
-                    </div>
+
+
+                             <h1 class="display-2 fw-bold mb-4 hero-title" style="color: yellow;">
+                                Find Your Perfect
+                                <span class="hero-highlight"style="color: yellow;">Pool Match</span>
+                            </h1>
+<!--                      </div>-->
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Statistics Section -->
+<!--    Statistics Section -->
     <section class="py-5 bg-light">
         <div class="container">
             <div class="row text-center g-4">
@@ -217,6 +177,68 @@
         </div>
     </section>
 
+<!-- Featured Events Section (for both logged-in and guest users) -->
+{% if featured_events and not user.is_authenticated %}
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">Upcoming Events</h2>
+            <p class="lead text-muted">Join exciting tournaments and competitions</p>
+        </div>
+        <div class="row g-4">
+            {% for event in featured_events %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="event-card card border-0 shadow-sm h-100">
+                        {% if event.poster %}
+                            <div class="event-poster-container">
+                                <img src="{{ event.poster.url }}"
+                                     class="card-img-top event-poster"
+                                     alt="{{ event.title }}"
+                                     onclick="openImageModal('{{ event.poster.url }}', '{{ event.title }} - Event Poster')"
+                                     style="cursor: pointer;">
+                                <div class="poster-overlay">
+                                    <i class="fas fa-expand-alt"></i>
+                                    <span>Click to view full size</span>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="card-img-top bg-gradient-primary d-flex align-items-center justify-content-center"
+                                 style="height: 250px;">
+                                <i class="fas fa-trophy fa-3x text-white"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">{{ event.title }}</h5>
+                            <p class="card-text text-muted">{{ event.description|truncatewords:20 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>{{ event.event_date|date:"M d, Y" }}
+                                </small>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>{{ event.event_date|date:"g:i A" }}
+                                </small>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-map-marker-alt me-1"></i>{{ event.location }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <a href="{% url 'accounts:register' %}" class="btn btn-primary w-100">
+                                Register to Participate
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+
+
     <!-- Testimonials Section -->
     <section class="py-5">
         <div class="container">
@@ -237,9 +259,9 @@
                             </div>
                             <p class="mb-4">"Amazing platform! I've met so many great players and improved my game significantly. The tournament feature is fantastic!"</p>
                             <div class="d-flex align-items-center">
-                                <div class="avatar bg-primary text-white rounded-circle me-3">MJ</div>
+                                <div class="avatar bg-primary text-white rounded-circle me-3">M</div>
                                 <div>
-                                    <div class="fw-bold">Mike Johnson</div>
+                                    <div class="fw-bold">Morgan</div>
                                     <small class="text-muted">Advanced Player</small>
                                 </div>
                             </div>
@@ -258,9 +280,9 @@
                             </div>
                             <p class="mb-4">"Perfect for beginners like me. Found patient players who helped me learn. The community is very welcoming!"</p>
                             <div class="d-flex align-items-center">
-                                <div class="avatar bg-secondary text-white rounded-circle me-3">SW</div>
+                                <div class="avatar bg-secondary text-white rounded-circle me-3">JP</div>
                                 <div>
-                                    <div class="fw-bold">Sarah Williams</div>
+                                    <div class="fw-bold">Justo pizo</div>
                                     <small class="text-muted">Beginner Player</small>
                                 </div>
                             </div>
@@ -279,9 +301,9 @@
                             </div>
                             <p class="mb-4">"Great way to find competitive matches. The scheduling system makes it so easy to organize games with other players."</p>
                             <div class="d-flex align-items-center">
-                                <div class="avatar bg-success text-white rounded-circle me-3">DC</div>
+                                <div class="avatar bg-success text-white rounded-circle me-3">AK</div>
                                 <div>
-                                    <div class="fw-bold">David Chen</div>
+                                    <div class="fw-bold">Amos kilonzo</div>
                                     <small class="text-muted">Professional Player</small>
                                 </div>
                             </div>
@@ -513,66 +535,6 @@
     </section>
 {% endif %}
 
-<!-- Featured Events Section (for both logged-in and guest users) -->
-{% if featured_events and not user.is_authenticated %}
-<section class="py-5">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="display-5 fw-bold mb-3">Upcoming Events</h2>
-            <p class="lead text-muted">Join exciting tournaments and competitions</p>
-        </div>
-        <div class="row g-4">
-            {% for event in featured_events %}
-                <div class="col-lg-4 col-md-6">
-                    <div class="event-card card border-0 shadow-sm h-100">
-                        {% if event.poster %}
-                            <div class="event-poster-container">
-                                <img src="{{ event.poster.url }}"
-                                     class="card-img-top event-poster"
-                                     alt="{{ event.title }}"
-                                     onclick="openImageModal('{{ event.poster.url }}', '{{ event.title }} - Event Poster')"
-                                     style="cursor: pointer;">
-                                <div class="poster-overlay">
-                                    <i class="fas fa-expand-alt"></i>
-                                    <span>Click to view full size</span>
-                                </div>
-                            </div>
-                        {% else %}
-                            <div class="card-img-top bg-gradient-primary d-flex align-items-center justify-content-center"
-                                 style="height: 250px;">
-                                <i class="fas fa-trophy fa-3x text-white"></i>
-                            </div>
-                        {% endif %}
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold">{{ event.title }}</h5>
-                            <p class="card-text text-muted">{{ event.description|truncatewords:20 }}</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">
-                                    <i class="fas fa-calendar me-1"></i>{{ event.event_date|date:"M d, Y" }}
-                                </small>
-                                <small class="text-muted">
-                                    <i class="fas fa-clock me-1"></i>{{ event.event_date|date:"g:i A" }}
-                                </small>
-                            </div>
-                            <div class="mt-2">
-                                <small class="text-muted">
-                                    <i class="fas fa-map-marker-alt me-1"></i>{{ event.location }}
-                                </small>
-                            </div>
-                        </div>
-                        <div class="card-footer bg-transparent border-0">
-                            <a href="{% url 'accounts:register' %}" class="btn btn-primary w-100">
-                                Join to Participate
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-{% endif %}
-
 <!-- CTA Section for Guests -->
 {% if not user.is_authenticated %}
 <section class="py-5 bg-primary text-white">
@@ -585,7 +547,7 @@
                 </p>
                 <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
                     <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg px-5">
-                        <i class="fas fa-user-plus me-2"></i>Get Started Free
+                        <i class="fas fa-user-plus me-2"></i>Register for Free
                     </a>
                     <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-lg px-5">
                         <i class="fas fa-sign-in-alt me-2"></i>Sign In
@@ -606,7 +568,7 @@
 {% block extra_css %}
 <style>
     .min-vh-75 {
-        min-height: 75vh;
+        min-height: 100vh;
     }
 
     /* Hero Section Background */
